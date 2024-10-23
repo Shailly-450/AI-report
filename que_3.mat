@@ -1,0 +1,53 @@
+function [value] = bandit_nonstat(action)
+    % Number of arms
+    num_arms = 10;
+
+    % Parameters
+    epsilon = 0.1; % Probability of exploration
+    time_steps = 1000; % Number of time steps
+    initial_mean = 0; % Initial mean reward for all arms
+    random_walk_std = 0.01; % Standard deviation for random walk
+    reward_noise_std = 1; % Standard deviation for reward noise
+    
+    % Initialize true mean rewards and estimates
+    true_means = initial_mean * ones(1, num_arms);
+    Q = zeros(1, num_arms); % Estimated action-values
+    N = zeros(1, num_arms); % Count of times each arm is selected
+    
+    % Array to store the reward over time
+    rewards = zeros(1, time_steps);
+
+    for t = 1:time_steps
+        % Update the true mean rewards with a random walk
+        true_means = true_means + normrnd(0, random_walk_std, [1, num_arms]);
+        
+        % Epsilon-greedy action selection
+        if rand < epsilon
+            % Exploration: choose a random arm
+            action = randi(num_arms);
+        else
+            % Exploitation: choose the arm with the highest estimated value
+            [~, action] = max(Q);
+        end
+        
+        % Generate the actual reward for the chosen action
+        reward = true_means(action) + normrnd(0, reward_noise_std);
+        
+        % Update the count and estimate for the selected action
+        N(action) = N(action) + 1;
+        Q(action) = Q(action) + (reward - Q(action)) / N(action);
+        
+        % Store the reward for this time step
+        rewards(t) = reward;
+    end
+    
+    % Output the total rewards for visualization
+    value = rewards;
+    
+    % Plot the rewards over time
+    figure;
+    plot(1:time_steps, rewards);
+    xlabel('Time step');
+    ylabel('Reward');
+    title('Non-Stationary 10-Armed Bandit: Rewards over Time');
+end
