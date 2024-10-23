@@ -1,0 +1,36 @@
+function epsilonGreedyBinaryBandit(bandit, epsilon, num_steps)
+    % bandit: function handle for the bandit (binaryBanditA or binaryBanditB)
+    % epsilon: probability of exploration
+    % num_steps: total number of trials to perform
+    
+    % Initialize action-value estimates and counts
+    Q = [0, 0];  % Estimated rewards for actions 1 and 2
+    N = [0, 0];  % Counts of how many times actions 1 and 2 were chosen
+
+    total_reward = 0;
+
+    for t = 1:num_steps
+       
+        if rand < epsilon
+            action = randi([1, 2]); 
+        else
+            [~, action] = max(Q);
+        end
+        
+        reward = bandit(action);
+
+        % Update counts and action-value estimate
+        N(action) = N(action) + 1;
+        Q(action) = Q(action) + (reward - Q(action)) / N(action);
+
+        % Update total reward
+        total_reward = total_reward + reward;
+        
+        if mod(t, 100) == 0
+            fprintf('Step: %d, Total Reward: %d\n', t, total_reward);
+        end
+    end
+
+    fprintf('Final Action-Value Estimates: Q(1) = %.2f, Q(2) = %.2f\n', Q(1), Q(2));
+    fprintf('Total Reward: %d\n', total_reward);
+end
