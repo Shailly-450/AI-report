@@ -1,0 +1,35 @@
+# Initialize bandit and agent
+bandit = TenArmedBandit()
+agent = ModifiedEpsilonGreedy(bandit, epsilon=0.1, alpha=0.1)
+
+# Run simulation for 10,000 time steps
+time_steps = 10000
+rewards, optimal_action_count = agent.run(time_steps)
+
+# Calculate average reward and percentage of optimal actions
+average_reward = np.mean(rewards)
+optimal_action_percentage = np.mean(optimal_action_count) * 100
+
+print(f'Average Reward after {time_steps} steps: {average_reward}')
+print(f'Percentage of Optimal Actions: {optimal_action_percentage:.2f}%')
+
+# Plot results
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(12,6))
+
+plt.subplot(2, 1, 1)
+plt.plot(np.cumsum(rewards) / (np.arange(time_steps) + 1))
+plt.xlabel('Time Steps')
+plt.ylabel('Average Reward')
+plt.title('Average Reward Over Time')
+
+plt.subplot(2, 1, 2)
+plt.plot(np.cumsum(optimal_action_count) / (np.arange(time_steps) + 1))
+plt.xlabel('Time Steps')
+plt.ylabel('Percentage of Optimal Action')
+plt.title('Optimal Action Percentage Over Time')
+
+plt.tight_layout()
+plt.show()
+ye h uska code cross check kr lena
